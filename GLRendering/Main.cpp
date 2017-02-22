@@ -8,6 +8,14 @@
 // Other includes
 #include <iostream>
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+	// When a user presses the escape key, we set the WindowShouldClose property to true, 
+	// closing the application
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
 int main()
 {
 	// We create the main function where we will instantiate the GLFW window
@@ -46,10 +54,20 @@ int main()
 	// We can set those dimensions via the glViewport function
 	glViewport(0, 0, width, height);
 
+	// We register the callback functions after we've created the window and before the game loop is initiated
+	glfwSetKeyCallback(window, key_callback);
+
 	// Init the game loop
 	while (!glfwWindowShouldClose(window))
 	{
+		// Check and call events
 		glfwPollEvents();
+
+		// Rendering commands here
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Swap the buffers
 		glfwSwapBuffers(window);
 	}
 
