@@ -1,9 +1,9 @@
 // GLEW
 #define GLEW_STATIC
-#include <glew.h>
+#include <GL/glew.h>
 
 // GLFW
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 
 // Other includes
 #include <iostream>

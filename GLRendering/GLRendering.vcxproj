@@ -73,7 +73,7 @@
     <LibraryPath>C:\Projects\OpenGL\_includes\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Projects\OpenGL\_includes\Include\GLFW;C:\Projects\OpenGL\_includes\Include\GL;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Projects\OpenGL\_includes\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Projects\OpenGL\_includes\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
