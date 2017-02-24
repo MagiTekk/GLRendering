@@ -73,10 +73,9 @@ int main()
 	// We can set those dimensions via the glViewport function
 	glViewport(0, 0, width, height);
 
+	// Build and compile our shader program
 #pragma region VertexShader
 
-	// Build and compile our shader program
-	// Vertex shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
@@ -95,8 +94,7 @@ int main()
 
 #pragma region FragmentShader
 
-	GLuint fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 
@@ -112,8 +110,7 @@ int main()
 
 #pragma region LinkShaders
 
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
+	GLuint shaderProgram = glCreateProgram();
 
 	// Link shaders to the shader program
 	glAttachShader(shaderProgram, vertexShader);
@@ -168,7 +165,7 @@ int main()
 
 #pragma endregion Triangle
 
-	// Init the game loop
+	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
 		// Check and call events
@@ -194,7 +191,7 @@ int main()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 
-	// Clean/delete all resources that were allocated
+	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
 	
 	return 0;
