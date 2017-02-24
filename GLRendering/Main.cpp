@@ -27,6 +27,13 @@ const GLchar* vertexShaderSource = "#version 330 core\n"
 "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
 "}\0";
 
+const GLchar* fragmentShaderSource = "#version 330 core \n"
+"out vect4 color;\n"
+"void main()\n"
+"{\n"
+"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\0";
+
 #pragma endregion Shaders
 
 // The MAIN function, from here we start the application and run the game loop
@@ -88,20 +95,60 @@ int main()
 
 #pragma region FragmentShader
 
+	GLuint fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+	// Check for compile time errors
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
 #pragma endregion FragmentShader
+
+#pragma region LinkShaders
+
+	GLuint shaderProgram;
+	shaderProgram = glCreateProgram();
+
+	// Link shaders to the shader program
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+
+	// Check for linking errors
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
+#pragma endregion
+
+	// delete the shader objects once we've linked them into the program object; we no longer need them anymore
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
 
 #pragma region Triangle
 
 	// Because we want to render a single triangle we want to specify a total of three vertices with each vertex having a 3D position. 
 	// We define them in normalized device coordinates (the visible region of OpenGL) in a GLfloat array
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
+		-0.5f, -0.5f, 0.0f, // Left  
+		0.5f, -0.5f, 0.0f, // Right 
+		0.0f,  0.5f, 0.0f  // Top   
 	};
 
-	GLuint VBO;
+	GLuint VBO, VAO;
+	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	glBindVertexArray(VAO);
 
 	// The buffer type of a vertex buffer object is GL_ARRAY_BUFFER. OpenGL allows us to bind to several buffers at once as long as they have a different buffer type
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -109,6 +156,15 @@ int main()
 	// We created the vertices, we made a buffer object to store those vertices (using the array buffer type)
 	// now let's store those vertices on the VBO (Vertex Buffer Object)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Tell OpenGL how it should interpret the vertex data (per vertex attribute)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
+
+	// Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+	glBindVertexArray(0);
 
 #pragma endregion Triangle
 
@@ -119,12 +175,24 @@ int main()
 		glfwPollEvents();
 
 		// Rendering commands here
+		
+		// Clear the colorbuffer
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Draw our first triangle
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0); // Unbind VAO
 
 		// Swap the buffers
 		glfwSwapBuffers(window);
 	}
+
+	// Properly de-allocate all resources once they've outlived their purpose
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 
 	// Clean/delete all resources that were allocated
 	glfwTerminate();
