@@ -51,7 +51,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	// Next we're required to create a window object. This window object holds all the windowing data and is used quite frequently by GLFW's other functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "GLRendering", nullptr, nullptr);
 
 	// Tell GLFW to make the context of our window the main context on the current thread
 	glfwMakeContextCurrent(window);
@@ -130,29 +130,45 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-#pragma region Triangle
+#pragma region Triangle/Rectangle
 
 	// Because we want to render a single triangle we want to specify a total of three vertices with each vertex having a 3D position. 
 	// We define them in normalized device coordinates (the visible region of OpenGL) in a GLfloat array
+	//GLfloat vertices[] = {
+	//	-0.5f, -0.5f, 0.0f, // Left  
+	//	0.5f, -0.5f, 0.0f, // Right 
+	//	0.0f,  0.5f, 0.0f  // Top   
+	//};
+
+	// Using EBO (Element buffer objects) we can store 4 vertices and draw two rectangles using indices
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f, // Left  
-		0.5f, -0.5f, 0.0f, // Right 
-		0.0f,  0.5f, 0.0f  // Top   
+		0.5f,  0.5f, 0.0f,  // Top Right
+		0.5f, -0.5f, 0.0f,  // Bottom Right
+		-0.5f, -0.5f, 0.0f,  // Bottom Left
+		-0.5f,  0.5f, 0.0f   // Top Left 
+	};
+	GLuint indices[] = {  // Note that we start from 0!
+		0, 1, 3,  // First Triangle
+		1, 2, 3   // Second Triangle
 	};
 
-	GLuint VBO, VAO;
+	// VBO (Vertex Buffer Object)
+	// VAO (Vertex Array Object)
+	// EBO (Element buffer object)
+	GLuint VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 
 	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray(VAO);
 
 	// The buffer type of a vertex buffer object is GL_ARRAY_BUFFER. OpenGL allows us to bind to several buffers at once as long as they have a different buffer type
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // store those vertices on the VBO (Vertex Buffer Object)
 
-	// We created the vertices, we made a buffer object to store those vertices (using the array buffer type)
-	// now let's store those vertices on the VBO (Vertex Buffer Object)
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Tell OpenGL how it should interpret the vertex data (per vertex attribute)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
@@ -163,7 +179,10 @@ int main()
 	// Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
 	glBindVertexArray(0);
 
-#pragma endregion Triangle
+#pragma endregion Triangle/Rectangle
+
+	// Uncommenting this call will result in wireframe polygons.
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -180,7 +199,8 @@ int main()
 		// Draw our first triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// glDrawArrays(GL_TRIANGLES, 0, 3); // Draws a triangle
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
 
 		// Swap the buffers
