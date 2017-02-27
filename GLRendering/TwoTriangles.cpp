@@ -9,6 +9,7 @@
 
 // Other includes
 #include <iostream>
+#include <chrono>
 
 TwoTriangles::TwoTriangles()
 {
@@ -27,10 +28,25 @@ TwoTriangles::TwoTriangles()
 		"}\0";
 
 	fragmentShaderSource = "#version 330 core \n"
+		"uniform vec3 drawingColor;\n"
+		"out vec4 outColor;\n"
+		"void main()\n"
+		"{\n"
+		"outColor = vec4(drawingColor, 1.0f);\n"
+		"}\0";
+
+	fragmentShaderYellowSource = "#version 330 core \n"
 		"out vec4 color;\n"
 		"void main()\n"
 		"{\n"
 		"color = vec4(1.0f, 0.9f, 0.2f, 1.0f);\n"
+		"}\0";
+
+	fragmentShaderGreenSource = "#version 330 core \n"
+		"out vec4 color;\n"
+		"void main()\n"
+		"{\n"
+		"color = vec4(0.1f, 1.0f, 0.1f, 1.0f);\n"
 		"}\0";
 
 #pragma endregion Shaders
@@ -44,6 +60,7 @@ TwoTriangles::~TwoTriangles()
 
 void TwoTriangles::Execute()
 {
+	//auto t_start = std::chrono::high_resolution_clock::now();
 	std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
 
 	// We create the main function where we will instantiate the GLFW window
@@ -113,6 +130,38 @@ void TwoTriangles::Execute()
 
 #pragma endregion FragmentShader
 
+#pragma region FragmentShaderYellow
+
+	GLuint fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShaderYellow, 1, &fragmentShaderYellowSource, NULL);
+	glCompileShader(fragmentShaderYellow);
+
+	// Check for compile time errors
+	glGetShaderiv(fragmentShaderYellow, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShaderYellow, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::YELLOW::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
+#pragma endregion FragmentShaderYellow
+
+#pragma region FragmentShaderGreen
+
+	GLuint fragmentShaderGreen = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShaderGreen, 1, &fragmentShaderGreenSource, NULL);
+	glCompileShader(fragmentShaderGreen);
+
+	// Check for compile time errors
+	glGetShaderiv(fragmentShaderGreen, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShaderGreen, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::GREEN::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
+#pragma endregion FragmentShaderGreen
+
 #pragma region LinkShaders
 
 	GLuint shaderProgram = glCreateProgram();
@@ -129,11 +178,41 @@ void TwoTriangles::Execute()
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 
+	GLuint shaderProgramYellow = glCreateProgram();
+
+	// Link shaders to the shader program
+	glAttachShader(shaderProgramYellow, vertexShader);
+	glAttachShader(shaderProgramYellow, fragmentShaderYellow);
+	glLinkProgram(shaderProgramYellow);
+
+	// Check for linking errors
+	glGetProgramiv(shaderProgramYellow, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(shaderProgramYellow, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::YELLOW::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
+	GLuint shaderProgramGreen = glCreateProgram();
+
+	// Link shaders to the shader program
+	glAttachShader(shaderProgramGreen, vertexShader);
+	glAttachShader(shaderProgramGreen, fragmentShaderGreen);
+	glLinkProgram(shaderProgramGreen);
+
+	// Check for linking errors
+	glGetProgramiv(shaderProgramGreen, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(shaderProgramGreen, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::GREEN::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
 #pragma endregion
 
 	// delete the shader objects once we've linked them into the program object; we no longer need them anymore
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	glDeleteShader(fragmentShaderYellow);
+	glDeleteShader(fragmentShaderGreen);
 
 #pragma region Triangles
 
@@ -192,13 +271,29 @@ void TwoTriangles::Execute()
 		glClearColor(0.3f, 0.3f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// Change the color of our fragment shader by setting the uniform
+		//auto t_now = std::chrono::high_resolution_clock::now();
+		//float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
+
+		GLint uniColor = glGetUniformLocation(shaderProgram, "drawingColor");
+		glUniform3f(uniColor, 1.0f, 0.0f, 0.0f);
+		//glUniform3f(uniColor, (sin(time * 4.0f) + 1.0f) / 2.0f, 0.0f, 0.0f);
+
 		// Use compiled program
 		glUseProgram(shaderProgram);
+
+		//glUseProgram(shaderProgramYellow);	// use a different shader for the color
 
 		// Draw the first triangle
 		glBindVertexArray(VAOs[0]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0); // Unbind VAO
+
+		//glUseProgram(shaderProgramGreen);		// use a different shader for the color
+
+		// Change the color of our fragment shader by setting the uniform
+		glUniform3f(uniColor, 0.0f, 1.0f, 0.0f);
+		//glUniform3f(uniColor, 0.0f, (sin(time * 4.0f) + 1.0f) / 2.0f, 0.0f);
 
 		// Draw the second triangle
 		glBindVertexArray(VAOs[1]);

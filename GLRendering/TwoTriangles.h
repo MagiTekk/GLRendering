@@ -19,6 +19,8 @@ private:
 
 	const GLchar* vertexShaderSource = nullptr;
 	const GLchar* fragmentShaderSource = nullptr;
+	const GLchar* fragmentShaderYellowSource = nullptr;
+	const GLchar* fragmentShaderGreenSource = nullptr;
 
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 };
