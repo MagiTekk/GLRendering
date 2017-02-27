@@ -22,17 +22,21 @@ TwoTriangles::TwoTriangles()
 	*/
 	vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 position;\n"
+		"in vec3 color;\n"
+		"out vec3 Color;\n"
 		"void main()\n"
 		"{\n"
+		"Color = color;\n"
 		"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
 		"}\0";
 
 	fragmentShaderSource = "#version 330 core \n"
-		"uniform vec3 drawingColor;\n"
+		//"uniform vec3 drawingColor;\n"
+		"in vec3 Color;\n"
 		"out vec4 outColor;\n"
 		"void main()\n"
 		"{\n"
-		"outColor = vec4(drawingColor, 1.0f);\n"
+		"outColor = vec4(Color, 1.0f);\n"
 		"}\0";
 
 	fragmentShaderYellowSource = "#version 330 core \n"
@@ -217,39 +221,46 @@ void TwoTriangles::Execute()
 #pragma region Triangles
 
 	GLfloat firstTriangle[] = {
-		0.5f,  0.5f, 0.0f,		// Top Right
-		0.5f, -0.45f, 0.0f,		// Bottom Right
-		-0.45f,  0.5f, 0.0f		// Top Left
+		0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,		// Top Right - Red
+		0.5f, -0.45f, 0.0f, 0.0f, 1.0f, 0.0f,		// Bottom Right - Green
+		-0.45f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f		// Top Left - Blue
 	};
 
 	GLfloat secondTriangle[] = {
-		-0.5f,  0.45f, 0.0f,	// Top Left
-		0.45f, -0.5f, 0.0f,		// Bottom Right
-		-0.5f,  -0.5f, 0.0f		// Bottom Left
+		-0.5f,  0.45f, 0.0f, 0.0f, 1.0f, 0.0f,	// Top Left - Green
+		0.45f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,	// Bottom Right - Red
+		-0.5f,  -0.5f, 0.0f, 0.0f, 0.0f, 1.0f	// Bottom Left - Blue
 	};
 
 	GLuint VBOs[2], VAOs[2];
 	glGenVertexArrays(2, VAOs);	// Since these objects are now arrays, we can omit the reference to their address
 	glGenBuffers(2, VBOs);
 
-#pragma region FirstTriangle
+	
+	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+	GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
 
+	//FirstTriangle
 	glBindVertexArray(VAOs[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(posAttrib);
+	glEnableVertexAttribArray(colAttrib);
+	// The fifth parameter is set to 6 * sizeof(float) now, because each vertex consists of 6 floating point attribute values.
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	// The offset of 3*sizeof(float) for the color attribute is there because each vertex starts with 3 floating point values for the position that it has to skip over.
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-#pragma endregion FirstTriangle
-#pragma region SecondTriangle
-
+	
+	//SecondTriangle
 	glBindVertexArray(VAOs[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(posAttrib);
+	glEnableVertexAttribArray(colAttrib);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -268,15 +279,15 @@ void TwoTriangles::Execute()
 		// Rendering commands here
 
 		// Clear the colorbuffer
-		glClearColor(0.3f, 0.3f, 0.1f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Change the color of our fragment shader by setting the uniform
 		//auto t_now = std::chrono::high_resolution_clock::now();
 		//float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
-		GLint uniColor = glGetUniformLocation(shaderProgram, "drawingColor");
-		glUniform3f(uniColor, 1.0f, 0.0f, 0.0f);
+		//GLint uniColor = glGetUniformLocation(shaderProgram, "drawingColor");
+		//glUniform3f(uniColor, 1.0f, 0.0f, 0.0f);
 		//glUniform3f(uniColor, (sin(time * 4.0f) + 1.0f) / 2.0f, 0.0f, 0.0f);
 
 		// Use compiled program
@@ -292,7 +303,7 @@ void TwoTriangles::Execute()
 		//glUseProgram(shaderProgramGreen);		// use a different shader for the color
 
 		// Change the color of our fragment shader by setting the uniform
-		glUniform3f(uniColor, 0.0f, 1.0f, 0.0f);
+		//glUniform3f(uniColor, 0.0f, 1.0f, 0.0f);
 		//glUniform3f(uniColor, 0.0f, (sin(time * 4.0f) + 1.0f) / 2.0f, 0.0f);
 
 		// Draw the second triangle
