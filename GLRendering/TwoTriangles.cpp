@@ -137,40 +137,44 @@ void TwoTriangles::Execute()
 
 #pragma region Triangles
 
-	// I will only define the vertices without indices since I'm going to draw with glDrawArrays (not making use of EBO)
-	GLfloat vertices[] = {
-		// First Triangle
-		0.5f,  0.5f, 0.0f,		// Top Right T1
-		0.5f, -0.45f, 0.0f,		// Bottom Right T1
-		-0.45f,  0.5f, 0.0f,	// Top Left T1
-		// Second Triangle
-		-0.5f,  0.45f, 0.0f,	// Top Left T2
-		0.45f, -0.5f, 0.0f,		// Bottom Right T2
-		-0.5f,  -0.5f, 0.0f,	// Bottom Left T2
+	GLfloat firstTriangle[] = {
+		0.5f,  0.5f, 0.0f,		// Top Right
+		0.5f, -0.45f, 0.0f,		// Bottom Right
+		-0.45f,  0.5f, 0.0f		// Top Left
 	};
 
-	// VBO (Vertex Buffer Object)
-	// VAO (Vertex Array Object)
-	GLuint VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	GLfloat secondTriangle[] = {
+		-0.5f,  0.45f, 0.0f,	// Top Left
+		0.45f, -0.5f, 0.0f,		// Bottom Right
+		-0.5f,  -0.5f, 0.0f		// Bottom Left
+	};
 
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	glBindVertexArray(VAO);
+	GLuint VBOs[2], VAOs[2];
+	glGenVertexArrays(2, VAOs);	// Since these objects are now arrays, we can omit the reference to their address
+	glGenBuffers(2, VBOs);
 
-	// The buffer type of a vertex buffer object is GL_ARRAY_BUFFER. OpenGL allows us to bind to several buffers at once as long as they have a different buffer type
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // store those vertices on the VBO (Vertex Buffer Object)
+#pragma region FirstTriangle
 
-	// Tell OpenGL how it should interpret the vertex data (per vertex attribute)
+	glBindVertexArray(VAOs[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-	// Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
+#pragma endregion FirstTriangle
+#pragma region SecondTriangle
+
+	glBindVertexArray(VAOs[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+#pragma endregion SecondTriangle
 #pragma endregion Triangles
 
 	// Uncommenting this call will result in wireframe polygons.
@@ -188,11 +192,17 @@ void TwoTriangles::Execute()
 		glClearColor(0.3f, 0.3f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Draw our first triangle
+		// Use compiled program
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Draw the first triangle
+		glBindVertexArray(VAOs[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0); // Unbind VAO
+
+		// Draw the second triangle
+		glBindVertexArray(VAOs[1]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0); // Unbind VAO
 
 		// Swap the buffers
@@ -200,8 +210,8 @@ void TwoTriangles::Execute()
 	}
 
 	// Properly de-allocate all resources once they've outlived their purpose
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(2, VAOs);
+	glDeleteBuffers(2, VBOs);
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
