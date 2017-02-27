@@ -1,2 +1,4 @@
 *.opendb
 *.db
+*.sln
+.vs/
