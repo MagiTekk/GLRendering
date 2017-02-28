@@ -125,11 +125,18 @@
   <ItemGroup>
     <ClCompile Include="HelloTriangle.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ShaderFiles.cpp" />
     <ClCompile Include="TwoTriangles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HelloTriangle.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderFiles.h" />
     <ClInclude Include="TwoTriangles.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GLRendering.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

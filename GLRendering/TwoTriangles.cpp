@@ -22,7 +22,7 @@ TwoTriangles::TwoTriangles()
 	*/
 	vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 position;\n"
-		"in vec3 color;\n"
+		"layout (location = 1) in vec3 color;\n"
 		"out vec3 Color;\n"
 		"void main()\n"
 		"{\n"
@@ -55,11 +55,6 @@ TwoTriangles::TwoTriangles()
 
 #pragma endregion Shaders
 
-}
-
-
-TwoTriangles::~TwoTriangles()
-{
 }
 
 void TwoTriangles::Execute()
@@ -236,20 +231,21 @@ void TwoTriangles::Execute()
 	glGenVertexArrays(2, VAOs);	// Since these objects are now arrays, we can omit the reference to their address
 	glGenBuffers(2, VBOs);
 
-	
-	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-	GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-
 	//FirstTriangle
 	glBindVertexArray(VAOs[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(posAttrib);
-	glEnableVertexAttribArray(colAttrib);
+
+	// Position Attribute
 	// The fifth parameter is set to 6 * sizeof(float) now, because each vertex consists of 6 floating point attribute values.
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	glEnableVertexAttribArray(0);
+
+	// Color attribute
 	// The offset of 3*sizeof(float) for the color attribute is there because each vertex starts with 3 floating point values for the position that it has to skip over.
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
@@ -257,10 +253,10 @@ void TwoTriangles::Execute()
 	glBindVertexArray(VAOs[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(posAttrib);
-	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -269,6 +265,10 @@ void TwoTriangles::Execute()
 
 	// Uncommenting this call will result in wireframe polygons.
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	GLint nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))

@@ -8,8 +8,6 @@ class HelloTriangle
 {
 public:
 	HelloTriangle();
-	~HelloTriangle();
-
 	void Execute();
 
 private:

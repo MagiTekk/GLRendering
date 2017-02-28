@@ -38,11 +38,6 @@ HelloTriangle::HelloTriangle()
 
 }
 
-
-HelloTriangle::~HelloTriangle()
-{
-}
-
 void HelloTriangle::Execute()
 {
 	std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
