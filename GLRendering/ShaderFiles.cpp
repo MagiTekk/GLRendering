@@ -87,6 +87,13 @@ void ShaderFiles::Execute()
 		// Use compiled program
 		ShaderProgram.Use();
 
+		// xOffset using an uniform
+		GLint uniXOffset =  glGetUniformLocation(ShaderProgram.Program, "xOffset");
+		glUniform1f(uniXOffset, 0.5f);
+		// OR
+		/*GLfloat offset = 0.5f;
+		glUniform1f(glGetUniformLocation(ShaderProgram.Program, "xOffset"), offset);*/
+
 		// Draw the triangle
 		glBindVertexArray(VAOs[0]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
