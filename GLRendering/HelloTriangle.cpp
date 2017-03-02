@@ -141,7 +141,7 @@ void HelloTriangle::Execute()
 	//	0.0f,  0.5f, 0.0f  // Top   
 	//};
 
-	// Using EBO (Element buffer objects) we can store 4 vertices and draw two rectangles using indices
+	// Using EBO (Element buffer objects) we can store 4 vertices and draw a rectangle from two triangles using indices
 	GLfloat vertices[] = {
 		0.5f,  0.5f, 0.0f,  // Top Right
 		0.5f, -0.5f, 0.0f,  // Bottom Right
