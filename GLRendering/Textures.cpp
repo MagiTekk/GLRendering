@@ -43,10 +43,10 @@ void Textures::Execute()
 
 	GLfloat vertices[] = {
 		// Positions          // Colors           // Texture Coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Top Right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
+		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // Top Right
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // Bottom Right
 		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Top Left 
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // Top Left 
 	};
 
 	GLuint indices[] = {  // Note that we start from 0!
@@ -81,10 +81,22 @@ void Textures::Execute()
 
 #pragma region Texture mapping
 
+	/* Texture Wrapping modes
+		- GL_REPEAT: The default behavior for textures. Repeats the texture image.
+		- GL_MIRRORED_REPEAT: Same as GL_REPEAT but mirrors the image with each repeat.
+		- GL_CLAMP_TO_EDGE: Clamps the coordinates between 0 and 1. The result is that higher coordinates become clamped to the edge, resulting in a stretched edge pattern.
+		- GL_CLAMP_TO_BORDER: Coordinates outside the range are now given a user-specified border color.
+	*/
+
+	/* Texture Filtering
+		- GL_NEAREST: OpenGL selects the pixel which center is closest to the texture coordinate
+		- GL_LINEAR: takes an interpolated value from the texture coordinate's neighboring texels, approximating a color between the texels
+	*/
+
 	// Load and create a texture 
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 
 	// Set the texture wrapping parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -96,12 +108,35 @@ void Textures::Execute()
 
 	// Loading an image with SOIL, create texture and generate mipmaps
 	int width, height;
-	unsigned char* image = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	unsigned char* image1 = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image1);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// After we're done generating the texture and its corresponding mipmaps, it is good practice to free the image memory and unbind the texture object
-	SOIL_free_image_data(image);
+	SOIL_free_image_data(image1);
+	glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentally mess up our texture.
+
+	// Load and create a texture 
+	GLuint texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	// Set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Loading an image with SOIL, create texture and generate mipmaps
+	//int width, height;
+	unsigned char* image2 = SOIL_load_image("../Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// After we're done generating the texture and its corresponding mipmaps, it is good practice to free the image memory and unbind the texture object
+	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentally mess up our texture.
 
 #pragma endregion
@@ -126,11 +161,21 @@ void Textures::Execute()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Binding the texture using our sampler to set the color of our rectangle
-		glBindTexture(GL_TEXTURE_2D, texture);
+		// Binding the textures using our sampler to set the color of our rectangle
+		// glBindTexture(GL_TEXTURE_2D, texture);
+		// Binding two textures
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture1"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture2"), 1);
 
 		// Use compiled program
 		ShaderProgram.Use();
+
+		// Set current uniform alphaBlend's value
+		glUniform1f(glGetUniformLocation(ShaderProgram.Program, "alphaBlend"), alphaBlend);
 
 		// Draw the rectangle
 		glBindVertexArray(VAO);
@@ -155,7 +200,26 @@ void Textures::Execute()
 void Textures::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	// When a user presses the escape key, we set the WindowShouldClose property to true, 
-	// closing the application
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (action == GLFW_PRESS)
+	{
+		switch (key)
+		{
+		case GLFW_KEY_ESCAPE:
+			// closing the application
+			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_UP:
+			if (alphaBlend > 0 && alphaBlend < 1)
+			{
+				alphaBlend += 0.1f;
+			}
+			break;
+		case GLFW_KEY_DOWN:
+			if (alphaBlend > 0 && alphaBlend < 1)
+			{
+				alphaBlend -= 0.1f;
+			}
+			break;
+		}
+	}
 }
