@@ -11,5 +11,5 @@ uniform float alphaBlend;
 
 void main()
 {
-	outColor = mix(texture(ourTexture1, TexCoord), texture(ourTexture2, vec2( 1.0 - TexCoord.x, TexCoord.y)), alphaBlend);
+	outColor = mix(texture(ourTexture1, TexCoord), texture(ourTexture2, vec2( 1.0 - TexCoord.x, TexCoord.y)), alphaBlend) * vec4(ourColor, 1.0f);
 }

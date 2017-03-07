@@ -30,7 +30,8 @@ void Textures::Execute()
 	glfwMakeContextCurrent(window);
 
 	//-- Input Binding
-	glfwSetKeyCallback(window, key_callback);
+	SetCallbackFunctions(window);
+	//glfwSetKeyCallback(window, key_callback);
 
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -208,18 +209,66 @@ void Textures::key_callback(GLFWwindow* window, int key, int scancode, int actio
 			// closing the application
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
-		case GLFW_KEY_UP:
-			if (alphaBlend > 0 && alphaBlend < 1)
-			{
-				alphaBlend += 0.1f;
-			}
+		}
+	}
+}
+
+/*------------- CALLBACKS (with access to member variables) ---------------*/
+#pragma region Callbacks
+void Textures::SetCallbackFunctions(GLFWwindow* window)
+{
+	GLFWCallbackWrapper::SetApplication(this);
+	glfwSetCursorPosCallback(window, GLFWCallbackWrapper::MousePositionCallback);
+	glfwSetKeyCallback(window, GLFWCallbackWrapper::KeyboardCallback);
+}
+
+Textures* Textures::GLFWCallbackWrapper::s_application = nullptr;
+
+void Textures::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
+{
+
+}
+
+void Textures::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		switch (key)
+		{
+		case GLFW_KEY_ESCAPE:
+			// closing the application
+			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
-		case GLFW_KEY_DOWN:
-			if (alphaBlend > 0 && alphaBlend < 1)
-			{
+			case GLFW_KEY_UP:
+				alphaBlend += 0.1f;
+				if (alphaBlend > 1.0f)
+				{
+					alphaBlend = 1.0f;
+				}
+			break;
+			case GLFW_KEY_DOWN:
 				alphaBlend -= 0.1f;
-			}
+				if (alphaBlend < 0.0f)
+				{
+					alphaBlend = 0.0f;
+				}
 			break;
 		}
 	}
 }
+
+void Textures::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
+{
+	s_application->MousePositionCallback(window, positionX, positionY);
+}
+
+void Textures::GLFWCallbackWrapper::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	s_application->KeyboardCallback(window, key, scancode, action, mods);
+}
+
+void Textures::GLFWCallbackWrapper::SetApplication(Textures *application)
+{
+	GLFWCallbackWrapper::s_application = application;
+}
+#pragma endregion
