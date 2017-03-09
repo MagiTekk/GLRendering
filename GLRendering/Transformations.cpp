@@ -45,14 +45,14 @@ void Transformations::Execute()
 	glViewport(0, 0, WIDTH, HEIGHT);
 
 	// Shader Program
-	Shader ShaderProgram("../Shaders/ColoredTextureShader.vert", "../Shaders/ColoredTextureShader.frag");
+	Shader ourShader("../Shaders/ColTextTransShader.vert", "../Shaders/ColTextTransShader.frag");
 
 	GLfloat vertices[] = {
 		// Positions          // Colors           // Texture Coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // Top Right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // Bottom Right
+		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Top Right
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
 		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // Top Left 
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Top Left 
 	};
 
 	GLuint indices[] = {  // Note that we start from 0!
@@ -118,18 +118,6 @@ void Transformations::Execute()
 	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-#pragma region Transformations
-	/*glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans;
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-	vec = trans * vec;
-	std::cout << vec.x << "::" << vec.y << "::" << vec.z << std::endl; // outputs 2::1::0*/
-
-	/*glm::mat4 trans;
-	trans = glm::rotate(trans, 90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));*/
-#pragma endregion
-
 	while (!glfwWindowShouldClose(window))
 	{
 		// Check and call events
@@ -145,16 +133,27 @@ void Transformations::Execute()
 		// Bind Textures
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
-		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture1"), 0);
+		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
-		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture2"), 1);
+		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
+
+	#pragma region Transformations
+		glm::mat4 trans;
+		trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+		// query the location of the uniform variable
+		GLuint transformLoc = glGetUniformLocation(ourShader.Program, "transform");
+		// send the matrix data to the shaders via glUniform function with Matrix4fv as its postfix
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+	#pragma endregion
 
 		// Use compiled program
-		ShaderProgram.Use();
+		ourShader.Use();
 
 		// Set our "mix" blending
-		glUniform1f(glGetUniformLocation(ShaderProgram.Program, "alphaBlend"), alphaBlend);
+		glUniform1f(glGetUniformLocation(ourShader.Program, "alphaBlend"), alphaBlend);
 
 		// Draw the rectangle
 		glBindVertexArray(VAO);
