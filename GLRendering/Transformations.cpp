@@ -138,6 +138,9 @@ void Transformations::Execute()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
+		// Use compiled program
+		ourShader.Use();
+
 	#pragma region Transformations
 		// When multiplying matrices the right - most matrix is first multiplied with the vector so you should read the multiplications from right to left.
 		// It is advised to first do [SCALING] operations, then [ROTATIONS] and lastly [TRANSLATIONS] when combining matrices otherwise they might(negatively) affect each other.
@@ -155,13 +158,24 @@ void Transformations::Execute()
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 	#pragma endregion
 
-		// Use compiled program
-		ourShader.Use();
-
 		// Set our "mix" blending
 		glUniform1f(glGetUniformLocation(ourShader.Program, "alphaBlend"), alphaBlend);
 
 		// Draw the rectangle
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0); // Unbind VAO
+
+		// Try drawing a second container with another call to glDrawElements but place it at a different position using transformations only.
+		// Make sure this second container is placed at the top-left of the window and instead of rotating, scale it over time (using the sin function is useful here; note that using sin will cause the object to invert as soon as a negative scale is applied)
+
+		trans = glm::mat4();	// Reset
+		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+		GLfloat scaleAmount = glm::sin(glfwGetTime());
+		trans = glm::scale(trans, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+		// Now with the uniform matrix being replaced with new transformations, draw it again.
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
