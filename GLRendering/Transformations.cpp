@@ -139,9 +139,15 @@ void Transformations::Execute()
 		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
 	#pragma region Transformations
+		// When multiplying matrices the right - most matrix is first multiplied with the vector so you should read the multiplications from right to left.
+		// It is advised to first do [SCALING] operations, then [ROTATIONS] and lastly [TRANSLATIONS] when combining matrices otherwise they might(negatively) affect each other.
+		// Remember that the actual transformation order should be read in reverse: even though in code we first translate and then later rotate, the actual transformations first apply a rotation and then a translation.
+
+		// [ROTATE] then [TRANSLATE]
 		glm::mat4 trans;
-		trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::rotate(trans, (GLfloat)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 
 		// query the location of the uniform variable
 		GLuint transformLoc = glGetUniformLocation(ourShader.Program, "transform");
