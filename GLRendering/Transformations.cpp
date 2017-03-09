@@ -158,7 +158,7 @@ void Transformations::Execute()
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 	#pragma endregion
 
-		// Set our "mix" blending
+		// Set our "mix" blending for the first drawn rectangle
 		glUniform1f(glGetUniformLocation(ourShader.Program, "alphaBlend"), alphaBlend);
 
 		// Draw the rectangle
@@ -166,19 +166,23 @@ void Transformations::Execute()
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
 
+		//-----
 		// Try drawing a second container with another call to glDrawElements but place it at a different position using transformations only.
 		// Make sure this second container is placed at the top-left of the window and instead of rotating, scale it over time (using the sin function is useful here; note that using sin will cause the object to invert as soon as a negative scale is applied)
-
 		trans = glm::mat4();	// Reset
 		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
 		GLfloat scaleAmount = glm::sin(glfwGetTime());
 		trans = glm::scale(trans, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
+		// Set our "mix" blending for the second drawn rectangle
+		glUniform1f(glGetUniformLocation(ourShader.Program, "alphaBlend"), alphaBlend2);
+
 		// Now with the uniform matrix being replaced with new transformations, draw it again.
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
+		//---
 
 		#pragma endregion
 
@@ -219,6 +223,35 @@ void Transformations::KeyboardCallback(GLFWwindow* window, int key, int scancode
 		case GLFW_KEY_ESCAPE:
 			// closing the application
 			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_UP:
+			alphaBlend += 0.1f;
+			if (alphaBlend > 1.0f)
+			{
+				alphaBlend = 1.0f;
+			}
+			break;
+		case GLFW_KEY_DOWN:
+			alphaBlend -= 0.1f;
+			if (alphaBlend < 0.0f)
+			{
+				alphaBlend = 0.0f;
+			}
+			break;
+		case GLFW_KEY_RIGHT:
+			alphaBlend2 += 0.1f;
+			if (alphaBlend2 > 1.0f)
+			{
+				alphaBlend2 = 1.0f;
+			}
+			break;
+		case GLFW_KEY_LEFT:
+			alphaBlend2 -= 0.1f;
+			if (alphaBlend2 < 0.0f)
+			{
+				alphaBlend2 = 0.0f;
+			}
+			break;
 		}
 	}
 }

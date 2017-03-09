@@ -18,6 +18,7 @@ private:
 	const GLuint WIDTH = 800, HEIGHT = 600;
 
 	GLfloat alphaBlend = 0.2f;
+	GLfloat alphaBlend2 = 0.2f;
 
 
 #pragma region Callbacks (with access to member variables)
