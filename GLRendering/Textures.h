@@ -1,13 +1,9 @@
 #pragma once
-//#include <GLFW/glfw3.h>
-#include <functional>
 
 struct GLFWwindow;
 typedef unsigned int GLuint;
 typedef float GLfloat;
 
-
-// http://stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
 
 class Textures
 {
@@ -23,10 +19,8 @@ private:
 	
 	GLfloat alphaBlend = 0.2f;
 
-	//static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-/*------------- CALLBACKS (with access to member variables) ---------------*/
-#pragma region Callbacks
+#pragma region Callbacks (with access to member variables)
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 	void SetCallbackFunctions(GLFWwindow* window);

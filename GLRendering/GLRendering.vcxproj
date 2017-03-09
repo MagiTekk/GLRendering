@@ -73,8 +73,8 @@
     <LibraryPath>_includes\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Projects\OpenGL\_includes\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Projects\OpenGL\_includes\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Projects\OpenGL\GLRendering\_includes\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Projects\OpenGL\GLRendering\_includes\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,6 +130,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ShaderFiles.cpp" />
     <ClCompile Include="Textures.cpp" />
+    <ClCompile Include="Transformations.cpp" />
     <ClCompile Include="TwoTriangles.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +139,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderFiles.h" />
     <ClInclude Include="Textures.h" />
+    <ClInclude Include="Transformations.h" />
     <ClInclude Include="TwoTriangles.h" />
   </ItemGroup>
   <ItemGroup>

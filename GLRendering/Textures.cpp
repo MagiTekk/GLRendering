@@ -213,8 +213,8 @@ void Textures::key_callback(GLFWwindow* window, int key, int scancode, int actio
 	}
 }
 
-/*------------- CALLBACKS (with access to member variables) ---------------*/
-#pragma region Callbacks
+
+#pragma region Callbacks (with access to member variables)
 void Textures::SetCallbackFunctions(GLFWwindow* window)
 {
 	GLFWCallbackWrapper::SetApplication(this);
