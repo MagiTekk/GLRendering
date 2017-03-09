@@ -45,14 +45,14 @@ void Transformations::Execute()
 	glViewport(0, 0, WIDTH, HEIGHT);
 
 	// Shader Program
-	Shader ShaderProgram("../Shaders/ColoredShader.vert", "../Shaders/ColoredShader.frag");
+	Shader ShaderProgram("../Shaders/ColoredTextureShader.vert", "../Shaders/ColoredTextureShader.frag");
 
 	GLfloat vertices[] = {
-		// Positions          // Colors
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,		// Top Right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,		// Bottom Right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,		// Bottom Left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,		// Top Left 
+		// Positions          // Colors           // Texture Coords
+		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // Top Right
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // Bottom Right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // Top Left 
 	};
 
 	GLuint indices[] = {  // Note that we start from 0!
@@ -74,13 +74,61 @@ void Transformations::Execute()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// Position Attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	// Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+	// Texture attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 	// Unbind VAO
 	glBindVertexArray(0);
+
+	// Load and create a texture 
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Loading an image with SOIL, create texture and generate mipmaps
+	int width, height;
+	unsigned char* image1 = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image1);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Load and create a texture 
+	GLuint texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Loading an image with SOIL, create texture and generate mipmaps
+	unsigned char* image2 = SOIL_load_image("../Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image2);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+#pragma region Transformations
+	/*glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+	glm::mat4 trans;
+	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	vec = trans * vec;
+	std::cout << vec.x << "::" << vec.y << "::" << vec.z << std::endl; // outputs 2::1::0*/
+
+	/*glm::mat4 trans;
+	trans = glm::rotate(trans, 90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));*/
+#pragma endregion
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -94,8 +142,19 @@ void Transformations::Execute()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// Bind Textures
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture1"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+		glUniform1i(glGetUniformLocation(ShaderProgram.Program, "ourTexture2"), 1);
+
 		// Use compiled program
 		ShaderProgram.Use();
+
+		// Set our "mix" blending
+		glUniform1f(glGetUniformLocation(ShaderProgram.Program, "alphaBlend"), alphaBlend);
 
 		// Draw the rectangle
 		glBindVertexArray(VAO);
