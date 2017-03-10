@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoordinateSystems.cpp" />
     <ClCompile Include="HelloTriangle.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ShaderFiles.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="TwoTriangles.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CoordinateSystems.h" />
     <ClInclude Include="HelloTriangle.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
