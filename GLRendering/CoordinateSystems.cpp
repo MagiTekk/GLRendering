@@ -115,6 +115,23 @@ void CoordinateSystems::Execute()
 	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+#pragma Going3D!
+	// Local Space -> [Model Matrix] -> World Space -> [View Matrix] -> View Space -> [Projection Matrix] -> Clip Space --{Viewport Transform}--> Screen Space
+
+	// 1. Model Matrix, we will just tilt our box along the X axis to give it a sense of depth
+	glm::mat4 model;
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	// 2. View Matrix, let's move the "camera" to the back by pushing our scene towards the other direction, in this case along the negative Z axis by 3 units
+	glm::mat4 view;
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	// 3. Projection Matrix, we use Orthogonal or Perspective projection
+	glm::mat4 projection;
+	projection = glm::perspective<GLfloat>(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
+
+#pragma endregion
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// Check and call events
@@ -122,6 +139,9 @@ void CoordinateSystems::Execute()
 
 		// ** Rendering commands here **
 		#pragma region Rendering commands
+
+		// Use compiled program
+		ourShader.Use();
 
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -135,8 +155,13 @@ void CoordinateSystems::Execute()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
-		// Use compiled program
-		ourShader.Use();
+		// Send our matrices to our shader
+		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		GLint projectionLoc = glGetUniformLocation(ourShader.Program, "projection");
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw the rectangle
 		glBindVertexArray(VAO);
