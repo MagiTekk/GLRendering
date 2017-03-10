@@ -171,7 +171,7 @@ void Transformations::Execute()
 		// Make sure this second container is placed at the top-left of the window and instead of rotating, scale it over time (using the sin function is useful here; note that using sin will cause the object to invert as soon as a negative scale is applied)
 		trans = glm::mat4();	// Reset
 		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-		GLfloat scaleAmount = glm::sin(glfwGetTime());
+		GLfloat scaleAmount = static_cast<GLfloat>( glm::sin(glfwGetTime()));
 		trans = glm::scale(trans, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
