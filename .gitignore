@@ -2,3 +2,4 @@
 *.db
 *.sln
 .vs/
+*.sdf

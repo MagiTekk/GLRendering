@@ -27,7 +27,7 @@ CoordinateSystems::CoordinateSystems()
 
 void CoordinateSystems::Execute()
 {
-	GLfloat startTime = glfwGetTime();
+	GLfloat startTime = static_cast<GLfloat>(glfwGetTime());
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -104,6 +104,19 @@ void CoordinateSystems::Execute()
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	/*GLuint indices[] = {  // Note that we start from 0!
 		0, 1, 3,  // First Triangle
 		1, 2, 3   // Second Triangle
@@ -168,7 +181,7 @@ void CoordinateSystems::Execute()
 	// Local Space -> [Model Matrix] -> World Space -> [View Matrix] -> View Space -> [Projection Matrix] -> Clip Space --{Viewport Transform}--> Screen Space
 
 	// 1. Model Matrix, we will just tilt our box along the X axis to give it a sense of depth
-	glm::mat4 model;
+	//glm::mat4 model;
 	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 	// 2. View Matrix, let's move the "camera" to the back by pushing our scene towards the other direction, in this case along the negative Z axis by 3 units
@@ -190,7 +203,6 @@ void CoordinateSystems::Execute()
 
 		// ** Rendering commands here **
 		#pragma region Rendering commands
-		GLfloat deltaTime = (GLfloat)glfwGetTime() - startTime;
 
 		// Use compiled program
 		ourShader.Use();
@@ -208,21 +220,35 @@ void CoordinateSystems::Execute()
 		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
 		// Send our matrices to our shader
-		model = glm::rotate(model, glm::radians(deltaTime * 50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//GLfloat deltaTime = (GLfloat)glfwGetTime() - startTime;
+		//startTime = static_cast<GLfloat>(glfwGetTime());
+		//glm::mat4 model;
+		//model = glm::rotate(model, glm::radians(deltaTime * 50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		//GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		GLint projectionLoc = glGetUniformLocation(ourShader.Program, "projection");
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-		// Draw the rectangle
+		// Draw
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (GLuint i = 0; i < 10; ++i)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			GLfloat angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians((GLfloat)glfwGetTime() * angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
 
-		startTime = glfwGetTime();
 		#pragma endregion
 
 		// Swap the buffers
