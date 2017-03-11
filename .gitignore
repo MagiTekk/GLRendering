@@ -3,3 +3,4 @@
 *.sln
 .vs/
 *.sdf
+*.idb
