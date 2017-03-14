@@ -1,5 +1,8 @@
 #pragma once
 
+// GLM
+#include <glm/glm.hpp>
+
 struct GLFWwindow;
 typedef unsigned int GLuint;
 typedef float GLfloat;
@@ -12,6 +15,10 @@ public:
 	void Execute();
 
 private:
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	// Window dimensions
 	const GLuint WIDTH = 800, HEIGHT = 600;

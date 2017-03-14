@@ -52,16 +52,6 @@ void Camera::Execute()
 	// Shader Program
 	Shader ourShader("../Shaders/CoordinateSystems.vert", "../Shaders/CoordinateSystems.frag");
 
-
-	/*GLfloat vertices[] =
-	{
-	// Positions         // Texture Coords
-	0.5f, 0.5f, 0.0f, 1.0f, 1.0f,   // Top Right
-	0.5f, -0.5f, 0.0f, 1.0f, 0.0f,   // Bottom Right
-	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,   // Bottom Left
-	-0.5f, 0.5f, 0.0f, 0.0f, 1.0f    // Top Left
-	};*/
-
 	GLfloat vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -119,24 +109,15 @@ void Camera::Execute()
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
-	/*GLuint indices[] = {  // Note that we start from 0!
-	0, 1, 3,  // First Triangle
-	1, 2, 3   // Second Triangle
-	};*/
-
 	GLuint VBO, VAO;// , EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	//glGenBuffers(1, &EBO);
 
 	//Our Rectangle
 	glBindVertexArray(VAO);
 	// Bind VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// Bind EBO
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// Position Attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -182,20 +163,20 @@ void Camera::Execute()
 #pragma region Camera
 
 	// Camera direction
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	// To define a camera we need to create a coordinate system with 3 perpendicular unit axes with the camera's position as the origin
 
 	// First we get the Z direction vector, this one is aiming in the opposite direction to where the camera is pointing at
-	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+	//glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
 	// Now we get the right vector X by creating a cross product between the Z vector and an up vector
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+	//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	//glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
 
 	// To get the Y direction vector we can easily do it having the Z and X by again applying a cross product from the two of them
-	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+	//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
 
 	// Using these camera vectors we can now create a LookAt matrix that proves very useful for creating a camera
 	// Look At
@@ -236,11 +217,12 @@ void Camera::Execute()
 		ourShader.Use();
 
 		// Camera/View transformation
-		GLfloat radius = 10.0f;
-		GLfloat camX = static_cast<GLfloat>( sin(glfwGetTime()) * radius);
-		GLfloat camZ = static_cast<GLfloat>( cos(glfwGetTime()) * radius);
 		glm::mat4 view;
-		view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+		// First we set the camera position to the previously defined cameraPos. 
+		// The direction is the current position + the direction vector we just defined. 
+		// This ensures that however we move, the camera keeps looking at the target direction.
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		// Projection
 		glm::mat4 projection;
@@ -268,8 +250,6 @@ void Camera::Execute()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0); // Unbind VAO
 
 #pragma endregion
@@ -278,16 +258,43 @@ void Camera::Execute()
 		glfwSwapBuffers(window);
 	}
 
-	// Properly de-allocate all resources once they've outlived their purpose
+	// De-allocate all resources
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	//glDeleteBuffers(1, &EBO);
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
 }
 
-#pragma region Callbacks (with access to member variables)
+void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		GLfloat cameraSpeed = 0.05f;
+		switch (key)
+		{
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_W:
+			cameraPos += cameraSpeed * cameraFront;
+			std::cout << "cameraPos: r:" << cameraPos.r << "cameraPos: s:" << cameraPos.s << "cameraPos: t:" << cameraPos.t << std::endl;
+			break;
+		case GLFW_KEY_S:
+			cameraPos -= cameraSpeed * cameraFront;
+			break;
+		case GLFW_KEY_A:
+			cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+			std::cout << "cameraPos: r:" << cameraPos.r << "cameraPos: s:" << cameraPos.s << "cameraPos: t:" << cameraPos.t << std::endl;
+			break;
+		case GLFW_KEY_D:
+			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+			break;
+		}
+	}
+}
+
+#pragma region Callback setup (with access to member variables)
 void Camera::SetCallbackFunctions(GLFWwindow* window)
 {
 	GLFWCallbackWrapper::SetApplication(this);
@@ -300,20 +307,6 @@ Camera* Camera::GLFWCallbackWrapper::s_application = nullptr;
 void Camera::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
 {
 
-}
-
-void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (action == GLFW_PRESS)
-	{
-		switch (key)
-		{
-		case GLFW_KEY_ESCAPE:
-			// closing the application
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			break;
-		}
-	}
 }
 
 void Camera::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
