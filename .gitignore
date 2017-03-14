@@ -2,5 +2,7 @@
 *.db
 *.sln
 .vs/
+.x64/
 *.sdf
 *.idb
+*.vcxproj
