@@ -1,11 +1,10 @@
-#include "CoordinateSystems.h"
-#include "Transformations.h"
+#include "Camera.h"
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
-	CoordinateSystems Coord;
-	Coord.Execute();
+	Camera Cam;
+	Cam.Execute();
 	
 	return 0;
 }
