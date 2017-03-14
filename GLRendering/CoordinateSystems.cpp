@@ -185,12 +185,15 @@ void CoordinateSystems::Execute()
 	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 	// 2. View Matrix, let's move the "camera" to the back by pushing our scene towards the other direction, in this case along the negative Z axis by 3 units
+	// Play with the view matrix by translating in several directions and see how the scene changes
 	glm::mat4 view;
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	view = glm::translate(view, glm::vec3(3.0f, 0.0f, -5.0f));
+	view = glm::rotate(view, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// 3. Projection Matrix, we use Orthogonal or Perspective projection
+	// Try experimenting with the FoV and aspect-ratio parameters of GLM's projection function
 	glm::mat4 projection;
-	projection = glm::perspective<GLfloat>(glm::radians(45.0f), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
+	projection = glm::perspective<GLfloat>(glm::radians(60.0f), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -238,7 +241,9 @@ void CoordinateSystems::Execute()
 			glm::mat4 model;
 			model = glm::translate(model, cubePositions[i]);
 			GLfloat angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians((GLfloat)glfwGetTime() * angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			// make every 3rd container (including the 1st) rotate over time
+			angle = i % 3 != 0 ? angle : glm::radians((GLfloat)glfwGetTime() * angle);
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
 			GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
