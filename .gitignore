@@ -2,10 +2,10 @@
 *.db
 *.sln
 .vs/
-.GLRendering/Debug/
-.GLRendering/x64/
-.GLRendering/.vcxproj
-.x64/
+GLRendering/Debug/
+GLRendering/x64/
+GLRendering/.vcxproj
+x64/
 *.sdf
 *.idb
 *.vcxproj
