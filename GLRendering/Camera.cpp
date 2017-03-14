@@ -47,6 +47,8 @@ void Camera::Execute()
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
+	glEnable(GL_DEPTH_TEST);
+
 	// Shader Program
 	Shader ourShader("../Shaders/CoordinateSystems.vert", "../Shaders/CoordinateSystems.frag");
 
@@ -177,16 +179,38 @@ void Camera::Execute()
 	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// -- 3D
-	glm::mat4 view;
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+#pragma region Camera
 
-	// 3. Projection Matrix, we use Orthogonal or Perspective projection
-	// Try experimenting with the FoV and aspect-ratio parameters of GLM's projection function
-	glm::mat4 projection;
-	projection = glm::perspective<GLfloat>(glm::radians(45.0f), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
+	// Camera direction
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	glEnable(GL_DEPTH_TEST);
+	// To define a camera we need to create a coordinate system with 3 perpendicular unit axes with the camera's position as the origin
+
+	// First we get the Z direction vector, this one is aiming in the opposite direction to where the camera is pointing at
+	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+	// Now we get the right vector X by creating a cross product between the Z vector and an up vector
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+	// To get the Y direction vector we can easily do it having the Z and X by again applying a cross product from the two of them
+	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+	// Using these camera vectors we can now create a LookAt matrix that proves very useful for creating a camera
+	// Look At
+
+	// GLM already does all this work for us. 
+	// We only have to specify a camera position, a target position and a vector that represents the up vector in world space 
+	// (the up vector we used for calculating the right vector). 
+	// GLM then creates the LookAt matrix that we can use as our view matrix
+	/*glm::mat4 view;
+	view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f));*/
+
+
+#pragma endregion
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -195,9 +219,6 @@ void Camera::Execute()
 
 		// ** Rendering commands here **
 #pragma region Rendering commands
-
-		// Use compiled program
-		ourShader.Use();
 
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -211,11 +232,27 @@ void Camera::Execute()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
+		// Activate shader
+		ourShader.Use();
 
+		// Camera/View transformation
+		GLfloat radius = 10.0f;
+		GLfloat camX = static_cast<GLfloat>( sin(glfwGetTime()) * radius);
+		GLfloat camZ = static_cast<GLfloat>( cos(glfwGetTime()) * radius);
+		glm::mat4 view;
+		view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+		// Projection
+		glm::mat4 projection;
+		projection = glm::perspective<GLfloat>(glm::radians(45.0f), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
+
+		// Get the uniform locations
+		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
 		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
+		GLint projLoc = glGetUniformLocation(ourShader.Program, "projection");
+
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		GLint projectionLoc = glGetUniformLocation(ourShader.Program, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw
 		glBindVertexArray(VAO);
@@ -225,7 +262,7 @@ void Camera::Execute()
 			model = glm::translate(model, cubePositions[i]);
 			GLfloat angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians((GLfloat)glfwGetTime() * angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
+			
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
