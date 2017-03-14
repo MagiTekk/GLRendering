@@ -278,14 +278,12 @@ void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int act
 			break;
 		case GLFW_KEY_W:
 			cameraPos += cameraSpeed * cameraFront;
-			std::cout << "cameraPos: r:" << cameraPos.r << "cameraPos: s:" << cameraPos.s << "cameraPos: t:" << cameraPos.t << std::endl;
 			break;
 		case GLFW_KEY_S:
 			cameraPos -= cameraSpeed * cameraFront;
 			break;
 		case GLFW_KEY_A:
 			cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-			std::cout << "cameraPos: r:" << cameraPos.r << "cameraPos: s:" << cameraPos.s << "cameraPos: t:" << cameraPos.t << std::endl;
 			break;
 		case GLFW_KEY_D:
 			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
