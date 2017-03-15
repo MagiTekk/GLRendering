@@ -276,10 +276,11 @@ void Camera::do_movement()
 {
 	// Camera controls
 	GLfloat cameraSpeed = 5.0f * deltaTime;
+	glm::vec3 fpsCameraFront = glm::vec3(cameraFront.x, 0.0f, cameraFront.z);
 	if (keys[GLFW_KEY_W])
-		cameraPos += cameraSpeed * cameraFront;
+		cameraPos += cameraSpeed * fpsCameraFront;	// use cameraFront to "fly"
 	if (keys[GLFW_KEY_S])
-		cameraPos -= cameraSpeed * cameraFront;
+		cameraPos -= cameraSpeed * fpsCameraFront;	// use cameraFront to "fly"
 	if (keys[GLFW_KEY_A])
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (keys[GLFW_KEY_D])
