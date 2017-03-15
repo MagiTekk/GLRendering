@@ -21,6 +21,15 @@ private:
 	void do_movement();
 	GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 	GLfloat lastFrame = 0.0f;  	// Time of last frame
+	
+	// Mouse calculations for the camera movement
+	// Center of the screen
+	GLfloat lastX = WIDTH / 2.0;
+	GLfloat lastY = HEIGHT / 2.0;
+	// declare our pitch and yaw values
+	GLfloat pitch = 0.0f;
+	GLfloat yaw = -90.0f; // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Euler angles work) so we initially rotate a bit to the left.
+	GLfloat firstMouse = true;
 
 
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -36,7 +45,7 @@ private:
 
 	void SetCallbackFunctions(GLFWwindow* window);
 
-	void MousePositionCallback(GLFWwindow* window, double positionX, double positionY);
+	void MousePositionCallback(GLFWwindow* window, double xpos, double ypos);
 	void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	class GLFWCallbackWrapper

@@ -39,6 +39,7 @@ void Camera::Execute()
 	glfwMakeContextCurrent(window);
 
 	//-- Input Binding
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	SetCallbackFunctions(window);
 
 	glewExperimental = GL_TRUE;
@@ -303,6 +304,44 @@ void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int act
 	}
 }
 
+void Camera::MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse) // this bool variable is initially set to true
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	GLfloat xoffset = xpos - lastX;
+	// Screen coordinates go from top to bottom, but OpenGL has a bottom to top screen position
+	GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates range from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	GLfloat sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// constrain our pitch so that the user cannot invert the camera
+	// after 90 degrees the camera rotates and makes a weird behavior
+	// we don't need to constrain our yaw since we want to be able to turn around
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	// Calculate the actual direction vector from the resulting yaw and pitch value
+	glm::vec3 front;
+	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	front.y = sin(glm::radians(pitch));
+	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	cameraFront = glm::normalize(front);
+}
+
 #pragma region Callback setup (with access to member variables)
 void Camera::SetCallbackFunctions(GLFWwindow* window)
 {
@@ -313,14 +352,9 @@ void Camera::SetCallbackFunctions(GLFWwindow* window)
 
 Camera* Camera::GLFWCallbackWrapper::s_application = nullptr;
 
-void Camera::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
+void Camera::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
-
-}
-
-void Camera::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
-{
-	s_application->MousePositionCallback(window, positionX, positionY);
+	s_application->MousePositionCallback(window, xpos, ypos);
 }
 
 void Camera::GLFWCallbackWrapper::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
