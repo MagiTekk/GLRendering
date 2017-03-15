@@ -195,8 +195,13 @@ void Camera::Execute()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// Check and call events
 		glfwPollEvents();
+		do_movement();
 
 		// ** Rendering commands here **
 #pragma region Rendering commands
@@ -266,29 +271,35 @@ void Camera::Execute()
 	glfwTerminate();
 }
 
+void Camera::do_movement()
+{
+	// Camera controls
+	GLfloat cameraSpeed = 5.0f * deltaTime;
+	if (keys[GLFW_KEY_W])
+		cameraPos += cameraSpeed * cameraFront;
+	if (keys[GLFW_KEY_S])
+		cameraPos -= cameraSpeed * cameraFront;
+	if (keys[GLFW_KEY_A])
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (keys[GLFW_KEY_D])
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
 void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS)
 	{
-		GLfloat cameraSpeed = 0.05f;
+		keys[key] = true;
 		switch (key)
 		{
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
-		case GLFW_KEY_W:
-			cameraPos += cameraSpeed * cameraFront;
-			break;
-		case GLFW_KEY_S:
-			cameraPos -= cameraSpeed * cameraFront;
-			break;
-		case GLFW_KEY_A:
-			cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-			break;
-		case GLFW_KEY_D:
-			cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-			break;
 		}
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		keys[key] = false;
 	}
 }
 
