@@ -30,6 +30,7 @@ private:
 	GLfloat pitch = 0.0f;
 	GLfloat yaw = -90.0f; // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Euler angles work) so we initially rotate a bit to the left.
 	GLfloat firstMouse = true;
+	GLfloat fov = 45.0f;
 
 
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -41,12 +42,13 @@ private:
 
 
 #pragma region Callbacks (with access to member variables)
-	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+	//static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 	void SetCallbackFunctions(GLFWwindow* window);
 
 	void MousePositionCallback(GLFWwindow* window, double xpos, double ypos);
 	void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 	class GLFWCallbackWrapper
 	{
@@ -58,6 +60,7 @@ private:
 
 		static void MousePositionCallback(GLFWwindow* window, double positionX, double positionY);
 		static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 		static void SetApplication(Camera *application);
 	private:
 		static Camera* s_application;

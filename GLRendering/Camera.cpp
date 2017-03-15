@@ -232,7 +232,7 @@ void Camera::Execute()
 
 		// Projection
 		glm::mat4 projection;
-		projection = glm::perspective<GLfloat>(glm::radians(45.0f), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
+		projection = glm::perspective<GLfloat>(glm::radians(fov), static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
 
 		// Get the uniform locations
 		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
@@ -304,6 +304,16 @@ void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int act
 	}
 }
 
+void Camera::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
+}
+
 void Camera::MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse) // this bool variable is initially set to true
@@ -348,6 +358,7 @@ void Camera::SetCallbackFunctions(GLFWwindow* window)
 	GLFWCallbackWrapper::SetApplication(this);
 	glfwSetCursorPosCallback(window, GLFWCallbackWrapper::MousePositionCallback);
 	glfwSetKeyCallback(window, GLFWCallbackWrapper::KeyboardCallback);
+	glfwSetScrollCallback(window, GLFWCallbackWrapper::ScrollCallback);
 }
 
 Camera* Camera::GLFWCallbackWrapper::s_application = nullptr;
@@ -360,6 +371,11 @@ void Camera::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, doub
 void Camera::GLFWCallbackWrapper::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	s_application->KeyboardCallback(window, key, scancode, action, mods);
+}
+
+void Camera::GLFWCallbackWrapper::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	s_application->ScrollCallback(window, xoffset, yoffset);
 }
 
 void Camera::GLFWCallbackWrapper::SetApplication(Camera *application)
