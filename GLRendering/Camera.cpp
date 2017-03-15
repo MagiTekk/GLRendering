@@ -161,39 +161,6 @@ void Camera::Execute()
 	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-#pragma region Camera
-
-	// Camera direction
-	//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	// To define a camera we need to create a coordinate system with 3 perpendicular unit axes with the camera's position as the origin
-
-	// First we get the Z direction vector, this one is aiming in the opposite direction to where the camera is pointing at
-	//glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-	// Now we get the right vector X by creating a cross product between the Z vector and an up vector
-	//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	//glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-
-	// To get the Y direction vector we can easily do it having the Z and X by again applying a cross product from the two of them
-	//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-	// Using these camera vectors we can now create a LookAt matrix that proves very useful for creating a camera
-	// Look At
-
-	// GLM already does all this work for us. 
-	// We only have to specify a camera position, a target position and a vector that represents the up vector in world space 
-	// (the up vector we used for calculating the right vector). 
-	// GLM then creates the LookAt matrix that we can use as our view matrix
-	/*glm::mat4 view;
-	view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));*/
-
-
-#pragma endregion
-
 	while (!glfwWindowShouldClose(window))
 	{
 		GLfloat currentFrame = glfwGetTime();
@@ -228,7 +195,9 @@ void Camera::Execute()
 		// First we set the camera position to the previously defined cameraPos. 
 		// The direction is the current position + the direction vector we just defined. 
 		// This ensures that however we move, the camera keeps looking at the target direction.
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+		//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	// glm's implemetation
+		view = calculate_lookAt_matrix(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		// Projection
 		glm::mat4 projection;
@@ -285,6 +254,43 @@ void Camera::do_movement()
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (keys[GLFW_KEY_D])
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+glm::mat4 Camera::calculate_lookAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp)
+{
+	// create a coordinate system with 3 perpendicular unit axes with the camera's position as the origin
+
+	// 1. Position = known
+	// 2. Calculate cameraDirection
+	glm::vec3 zaxis = glm::normalize(position - target);
+	// 3. Get positive right axis vector
+	glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(worldUp), zaxis));
+	// 4. Calculate camera up vector
+	glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+	// Using these camera vectors we can now create a LookAt matrix that proves very useful for creating a camera
+	// Look At
+
+	// Create translation and rotation matrix
+	// In glm we access elements as mat[col][row] due to column-major layout
+	glm::mat4 translation; // Identity matrix by default
+	translation[3][0] = -position.x; // Third column, first row
+	translation[3][1] = -position.y;
+	translation[3][2] = -position.z;
+
+	glm::mat4 rotation;
+	rotation[0][0] = xaxis.x; // First column, first row
+	rotation[1][0] = xaxis.y;
+	rotation[2][0] = xaxis.z;
+	rotation[0][1] = yaxis.x; // First column, second row
+	rotation[1][1] = yaxis.y;
+	rotation[2][1] = yaxis.z;
+	rotation[0][2] = zaxis.x; // First column, third row
+	rotation[1][2] = zaxis.y;
+	rotation[2][2] = zaxis.z;
+
+	// Return lookAt matrix as combination of translation and rotation matrix
+	return rotation * translation;	// Remember to read from right to left (first translation then rotation)
 }
 
 void Camera::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
