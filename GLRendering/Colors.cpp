@@ -50,7 +50,8 @@ void Colors::Execute()
 	glEnable(GL_DEPTH_TEST);
 
 	// Shader Program
-	Shader ourShader("../Shaders/Colors.vert", "../Shaders/Colors.frag");
+	Shader lightingShader("../Shaders/Lightning.vert", "../Shaders/Lightning.frag");
+	Shader lampShader("../Shaders/Lamp.vert", "../Shaders/Lamp.frag");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {
@@ -141,9 +142,9 @@ void Colors::Execute()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Activate shader
-		ourShader.Use();
-		GLint objectColorLoc = glGetUniformLocation(ourShader.Program, "objectColor");
-		GLint lightColorLoc = glGetUniformLocation(ourShader.Program, "lightColor");
+		lightingShader.Use();
+		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");
+		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
 		glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
 
@@ -156,26 +157,38 @@ void Colors::Execute()
 		projection = glm::perspective<GLfloat>(camera.Zoom, static_cast<GLfloat>(WIDTH) / static_cast<GLfloat>(HEIGHT), 0.1f, 100.0f);
 
 		// Get the uniform locations
-		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
-		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
-		GLint projLoc = glGetUniformLocation(ourShader.Program, "projection");
+		GLint modelLoc = glGetUniformLocation(lightingShader.Program, "model");
+		GLint viewLoc = glGetUniformLocation(lightingShader.Program, "view");
+		GLint projLoc = glGetUniformLocation(lightingShader.Program, "projection");
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw
 		glBindVertexArray(containerVAO);
-
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		//GLfloat angle = 0.0f;
-		//model = glm::rotate(model, glm::radians((GLfloat)glfwGetTime() * angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-
 		glBindVertexArray(0); // Unbind VAO
+
+		// Also draw the lamp object, again binding the appropriate shader
+		lampShader.Use();
+		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
+		modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		viewLoc = glGetUniformLocation(lampShader.Program, "view");
+		projLoc = glGetUniformLocation(lampShader.Program, "projection");
+		// Set matrices
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		model = glm::mat4();
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		// Draw the light object (using light's vertex attributes)
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
 
 		#pragma endregion
 
