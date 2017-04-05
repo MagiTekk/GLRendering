@@ -5,7 +5,6 @@
 GLRendering/Debug/
 GLRendering/x64/
 GLRendering/.vcxproj
-x64/
 *.sdf
 *.idb
 *.vcxproj
