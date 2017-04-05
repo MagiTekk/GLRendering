@@ -40,7 +40,7 @@ void Textures::Execute()
 	glViewport(0, 0, WIDTH, HEIGHT);
 
 	// Shader Program
-	Shader ShaderProgram("../Shaders/ColoredTextureShader.vert", "../Shaders/ColoredTextureShader.frag");
+	Shader ShaderProgram("Content/Shaders/ColoredTextureShader.vert", "Content/Shaders/ColoredTextureShader.frag");
 
 	GLfloat vertices[] = {
 		// Positions          // Colors           // Texture Coords
@@ -109,7 +109,7 @@ void Textures::Execute()
 
 	// Loading an image with SOIL, create texture and generate mipmaps
 	int width, height;
-	unsigned char* image1 = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image1 = SOIL_load_image("Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image1);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -132,7 +132,7 @@ void Textures::Execute()
 
 	// Loading an image with SOIL, create texture and generate mipmaps
 	//int width, height;
-	unsigned char* image2 = SOIL_load_image("../Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image2 = SOIL_load_image("Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
 	glGenerateMipmap(GL_TEXTURE_2D);
 

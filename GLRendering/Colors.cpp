@@ -50,8 +50,8 @@ void Colors::Execute()
 	glEnable(GL_DEPTH_TEST);
 
 	// Shader Program
-	Shader lightingShader("../Shaders/Lightning.vert", "../Shaders/Lightning.frag");
-	Shader lampShader("../Shaders/Lamp.vert", "../Shaders/Lamp.frag");
+	Shader lightingShader("Content/Shaders/Lightning.vert", "Content/Shaders/Lightning.frag");
+	Shader lampShader("Content/Shaders/Lamp.vert", "Content/Shaders/Lamp.frag");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {

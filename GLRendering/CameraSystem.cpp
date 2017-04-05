@@ -51,7 +51,7 @@ void CameraSystem::Execute()
 	glEnable(GL_DEPTH_TEST);
 
 	// Shader Program
-	Shader ourShader("../Shaders/CoordinateSystems.vert", "../Shaders/CoordinateSystems.frag");
+	Shader ourShader("Content/Shaders/CoordinateSystems.vert", "Content/Shaders/CoordinateSystems.frag");
 
 	GLfloat vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -139,7 +139,7 @@ void CameraSystem::Execute()
 
 	// Loading an image with SOIL, create texture and generate mipmaps
 	int width, height;
-	unsigned char* image1 = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image1 = SOIL_load_image("Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image1);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image1);
@@ -155,7 +155,7 @@ void CameraSystem::Execute()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Loading an image with SOIL, create texture and generate mipmaps
-	unsigned char* image2 = SOIL_load_image("../Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image2 = SOIL_load_image("Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image2);

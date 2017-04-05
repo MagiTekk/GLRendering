@@ -45,7 +45,7 @@ void Transformations::Execute()
 	glViewport(0, 0, WIDTH, HEIGHT);
 
 	// Shader Program
-	Shader ourShader("../Shaders/ColTextTransShader.vert", "../Shaders/ColTextTransShader.frag");
+	Shader ourShader("Content/Shaders/ColTextTransShader.vert", "Content/Shaders/ColTextTransShader.frag");
 
 	GLfloat vertices[] = {
 		// Positions          // Colors           // Texture Coords
@@ -96,7 +96,7 @@ void Transformations::Execute()
 
 	// Loading an image with SOIL, create texture and generate mipmaps
 	int width, height;
-	unsigned char* image1 = SOIL_load_image("../Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image1 = SOIL_load_image("Content/Textures/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image1);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image1);
@@ -112,7 +112,7 @@ void Transformations::Execute()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Loading an image with SOIL, create texture and generate mipmaps
-	unsigned char* image2 = SOIL_load_image("../Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image2 = SOIL_load_image("Content/Textures/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image2);

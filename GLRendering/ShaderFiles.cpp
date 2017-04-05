@@ -40,7 +40,7 @@ void ShaderFiles::Execute()
 	glViewport(0, 0, width, height);
 
 	// Shader Program
-	Shader ShaderProgram("../Shaders/ColoredShader.vert", "../Shaders/ColoredShader.frag");
+	Shader ShaderProgram("Content/Shaders/ColoredShader.vert", "Content/Shaders/ColoredShader.frag");
 
 	GLfloat firstTriangle[] = {
 		0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,		// Top - Red
