@@ -15,15 +15,6 @@
 // Other includes
 #include <iostream>
 
-Camera::Camera()
-{
-	// Init Zoom
-	Zoom = glm::radians(fov);
-}
-
-Camera::~Camera()
-{
-}
 
 void Camera::SetCameraPos(glm::vec3 _cameraPos)
 {
@@ -88,9 +79,4 @@ void Camera::ProcessMouseScroll(GLfloat yoffset)
 
 	// Update Zoom
 	Zoom = glm::radians(fov);
-}
-
-glm::mat4 Camera::GetViewMatrix() const
-{
-	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }

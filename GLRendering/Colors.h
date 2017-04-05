@@ -26,7 +26,8 @@ private:
 	GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 	// Camera
-	Camera camera;
+	//Camera camera;
+	Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f) };
 	GLfloat lastX = static_cast<GLfloat>(WIDTH / 2.0);
 	GLfloat lastY = static_cast<GLfloat>(HEIGHT / 2.0);
 

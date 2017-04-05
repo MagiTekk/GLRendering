@@ -22,8 +22,6 @@
 
 Colors::Colors()
 {
-	// Init camera position
-	camera.SetCameraPos(glm::vec3(0.0f, 0.0f, 3.0f));
 }
 
 void Colors::Execute()
@@ -197,13 +195,13 @@ void Colors::do_movement()
 {
 	// Camera controls
 	if (keys[GLFW_KEY_W])
-		camera.ProcessKeyboard(Direction::FORWARD, deltaTime);
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	if (keys[GLFW_KEY_S])
-		camera.ProcessKeyboard(Direction::BACKWARD, deltaTime);
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	if (keys[GLFW_KEY_A])
-		camera.ProcessKeyboard(Direction::LEFT, deltaTime);
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D])
-		camera.ProcessKeyboard(Direction::RIGHT, deltaTime);
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 void Colors::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
