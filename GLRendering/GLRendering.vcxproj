@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicLighting.cpp" />
     <ClCompile Include="CameraSystem.cpp" />
     <ClCompile Include="Colors.cpp" />
     <ClCompile Include="CoordinateSystems.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="TwoTriangles.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicLighting.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="Colors.h" />
