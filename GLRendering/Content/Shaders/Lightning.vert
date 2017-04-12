@@ -27,7 +27,7 @@ void main()
 	// Note that we also cast the matrix to a 3x3 matrix to ensure it loses its translation properties and that it can multiply with the vec3 normal vector
 	
 	// calculating the normal matrix in world space
-	//Normal = mat3(transpose(inverse(model))) * normal;
+	//Normal = mat3(transpose(inverse(view * model))) * normal;
 	
 	// this here below was just fine because we did not perform any scaling operation on the object itself 
 	// so there was not really a need to use a normal matrix and could've just multiplied the normals with the model matrix
