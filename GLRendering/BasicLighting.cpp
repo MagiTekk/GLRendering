@@ -26,7 +26,7 @@ BasicLighting::BasicLighting()
 
 void BasicLighting::Execute()
 {
-	GLfloat startTime = static_cast<GLfloat>(glfwGetTime());
+	//GLfloat startTime = static_cast<GLfloat>(glfwGetTime());
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -142,6 +142,10 @@ void BasicLighting::Execute()
 		// ** Rendering commands here **
 #pragma region Rendering commands
 
+		// Calculate DeltaTime
+		//GLfloat deltaTime = (GLfloat)glfwGetTime() - startTime;
+		//startTime = static_cast<GLfloat>(glfwGetTime());
+
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -181,7 +185,7 @@ void BasicLighting::Execute()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // Unbind VAO
 
-							  // Also draw the lamp object, again binding the appropriate shader
+		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
@@ -190,6 +194,14 @@ void BasicLighting::Execute()
 		// Set matrices
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		
+		// Note: to make something rotate around it's center, use the cos in one axis and the sin in the other to contrarrest the motion and rotate
+		// make sure to add some value to move the object a bit far from it's center
+		// Change the light's position values over time (can be done anywhere in the game loop actually, but try to do it at least before using the light source positions)
+		lightPos.x = 2.0f * cos(glfwGetTime());
+		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+		lightPos.z = 2.0f * sin(glfwGetTime());
+
 		model = glm::mat4();
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube

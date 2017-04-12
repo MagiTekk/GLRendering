@@ -30,7 +30,8 @@ private:
 	GLfloat lastY = static_cast<GLfloat>(HEIGHT / 2.0);
 
 	// Light attributes - in world coordinates
-	glm::vec3 lightPos{ 1.2f, 1.0f, 2.0f };
+	//glm::vec3 lightPos{ 1.2f, 1.0f, 2.0f };
+	glm::vec3 lightPos{ 0.0f, 0.0f, 0.0f };
 
 	// Movement
 	bool keys[1024] = { false };
