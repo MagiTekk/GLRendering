@@ -2,37 +2,41 @@
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 
-out vec3 Normal;
-out vec3 FragPos;
-out vec3 LightPos;
+out vec3 LightingColor; // Resulting color from lighting calculations
 
 uniform vec3 lightPos;
+uniform vec3 lightColor;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main()
-{
-    gl_Position = projection * view * model * vec4(position, 1.0f);
-	
-	// get the fragment position in world coordinates, we have to multiply it with the model matrix - added the view to convert to view position
-	FragPos = vec3(view * model * vec4(position, 1.0f));
-	LightPos = vec3(view * vec4(lightPos, 1.0)); // Transform world-space light position to view-space light position
-	
-	// this here is to obtain the Normal vector in world coordinates
-	// but since we cannot just use the model matrix for this
-	// we have to calculate the normal matrix by using
-	// the transpose of the inverse of the upper-left corner of the model matrix
-	// Note that we also cast the matrix to a 3x3 matrix to ensure it loses its translation properties and that it can multiply with the vec3 normal vector
-	
-	// calculating the normal matrix in world space
-	//Normal = mat3(transpose(inverse(view * model))) * normal;
-	
-	// this here below was just fine because we did not perform any scaling operation on the object itself 
-	// so there was not really a need to use a normal matrix and could've just multiplied the normals with the model matrix
-	// Normal = normal;
-	
-	// calculating the normal matrix in view space
-	Normal = mat3(transpose(inverse(model))) * normal;
+{	
+	gl_Position = projection * view * model * vec4(position, 1.0f);
+    
+    // Gouraud Shading
+    // ------------------------
+    vec3 Position = vec3(view * model * vec4(position, 1.0f));
+    vec3 Normal = mat3(transpose(inverse(view * model))) * normal;
+    
+    // Ambient
+    float ambientStrength = 0.1f;
+    vec3 ambient = ambientStrength * lightColor;
+  	
+    // Diffuse 
+    vec3 norm = normalize(Normal);
+	vec3 _LightPos = vec3(view * vec4(lightPos, 1.0)); // Transform world-space light position to view-space light position
+    vec3 lightDir = normalize(_LightPos - Position);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+    
+    // Specular
+    float specularStrength = 1.0f; // This is set higher to better show the effect of Gouraud shading 
+    vec3 viewDir = normalize(-Position);
+    vec3 reflectDir = reflect(-lightDir, norm);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * lightColor;      
+
+    LightingColor = ambient + diffuse + specular;
 }

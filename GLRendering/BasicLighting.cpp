@@ -155,7 +155,7 @@ void BasicLighting::Execute()
 		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");
 		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
 		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
-		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
+		//GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
@@ -197,9 +197,9 @@ void BasicLighting::Execute()
 		// Note: to make something rotate around it's center, use the cos in one axis and the sin in the other to contrarrest the motion and rotate
 		// make sure to add some value to move the object a bit far from it's center
 		// Change the light's position values over time (can be done anywhere in the game loop actually, but try to do it at least before using the light source positions)
-		lightPos.x = 2.0f * cos(glfwGetTime());
+		/*lightPos.x = 2.0f * cos(glfwGetTime());
 		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-		lightPos.z = 2.0f * sin(glfwGetTime());
+		lightPos.z = 2.0f * sin(glfwGetTime());*/
 
 		model = glm::mat4();
 		model = glm::translate(model, lightPos);
