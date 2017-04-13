@@ -152,12 +152,20 @@ void Materials::Execute()
 
 		// Activate shader
 		lightingShader.Use();
-		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");
 		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
 		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
-		glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
+
+		// Get material uniform
+		GLint matAmbientLoc = glGetUniformLocation(lightingShader.Program, "material.ambient");
+		GLint matDiffuseLoc = glGetUniformLocation(lightingShader.Program, "material.diffuse");
+		GLint matSpecularLoc = glGetUniformLocation(lightingShader.Program, "material.specular");
+		GLint matShineLoc = glGetUniformLocation(lightingShader.Program, "material.shininess");
+		glUniform3f(matAmbientLoc, 1.0f, 0.5f, 0.31f);
+		glUniform3f(matDiffuseLoc, 1.0f, 0.5f, 0.31f);
+		glUniform3f(matSpecularLoc, 0.5f, 0.5f, 0.5f);
+		glUniform1f(matShineLoc, 32.0f);
 
 		// Camera/View transformation
 		glm::mat4 view;
