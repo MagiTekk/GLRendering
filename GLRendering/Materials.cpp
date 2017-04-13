@@ -157,7 +157,7 @@ void Materials::Execute()
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
 
-		// Get material uniform
+		// Get/Set material uniform properties
 		GLint matAmbientLoc = glGetUniformLocation(lightingShader.Program, "material.ambient");
 		GLint matDiffuseLoc = glGetUniformLocation(lightingShader.Program, "material.diffuse");
 		GLint matSpecularLoc = glGetUniformLocation(lightingShader.Program, "material.specular");
@@ -166,6 +166,24 @@ void Materials::Execute()
 		glUniform3f(matDiffuseLoc, 1.0f, 0.5f, 0.31f);
 		glUniform3f(matSpecularLoc, 0.5f, 0.5f, 0.5f);
 		glUniform1f(matShineLoc, 32.0f);
+
+		// Get/Set Lighting properties
+		GLint lightAmbientLoc = glGetUniformLocation(lightingShader.Program, "light.ambient");
+		GLint lightDiffuseLoc = glGetUniformLocation(lightingShader.Program, "light.diffuse");
+		GLint lightSpecularLoc = glGetUniformLocation(lightingShader.Program, "light.specular");
+		//glUniform3f(lightAmbientLoc, 0.2f, 0.2f, 0.2f);
+		//glUniform3f(lightDiffuseLoc, 0.5f, 0.5f, 0.5f);
+		glUniform3f(lightSpecularLoc, 1.0f, 1.0f, 1.0f);
+
+		// Change color over time
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 1.0f);
+		lightColor.y = sin(glfwGetTime() * 0.5f);
+		lightColor.z = sin(glfwGetTime() * 2.0f);
+		glm::vec3 diffuseColor = lightColor   * glm::vec3(0.8f); // Decrease the influence, not to expose it at a 100%
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // Same color, just Lower influence
+		glUniform3f(lightAmbientLoc, ambientColor.x, ambientColor.y, ambientColor.z);
+		glUniform3f(lightDiffuseLoc, diffuseColor.x, diffuseColor.y, diffuseColor.z);
 
 		// Camera/View transformation
 		glm::mat4 view;
@@ -191,7 +209,7 @@ void Materials::Execute()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // Unbind VAO
 
-							  // Also draw the lamp object, again binding the appropriate shader
+		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
