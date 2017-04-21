@@ -48,6 +48,9 @@
     <ClCompile Include="Materials.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightingMaps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TwoTriangles.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Materials.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
