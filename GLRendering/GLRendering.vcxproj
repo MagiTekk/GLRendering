@@ -131,6 +131,7 @@
     <ClCompile Include="Colors.cpp" />
     <ClCompile Include="CoordinateSystems.cpp" />
     <ClCompile Include="HelloTriangle.cpp" />
+    <ClCompile Include="LightCasters.cpp" />
     <ClCompile Include="LightingMaps.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Materials.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Colors.h" />
     <ClInclude Include="CoordinateSystems.h" />
     <ClInclude Include="HelloTriangle.h" />
+    <ClInclude Include="LightCasters.h" />
     <ClInclude Include="LightingMaps.h" />
     <ClInclude Include="Materials.h" />
     <ClInclude Include="resource.h" />
