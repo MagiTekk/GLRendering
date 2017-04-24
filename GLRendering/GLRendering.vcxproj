@@ -160,6 +160,26 @@
   <ItemGroup>
     <ResourceCompile Include="GLRendering.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Shaders\ColoredShader.frag" />
+    <None Include="Content\Shaders\ColoredShader.vert" />
+    <None Include="Content\Shaders\ColoredTextureShader.frag" />
+    <None Include="Content\Shaders\ColoredTextureShader.vert" />
+    <None Include="Content\Shaders\ColTextTransShader.frag" />
+    <None Include="Content\Shaders\ColTextTransShader.vert" />
+    <None Include="Content\Shaders\CoordinateSystems.frag" />
+    <None Include="Content\Shaders\CoordinateSystems.vert" />
+    <None Include="Content\Shaders\Lamp.frag" />
+    <None Include="Content\Shaders\Lamp.vert" />
+    <None Include="Content\Shaders\LightCasters.frag" />
+    <None Include="Content\Shaders\LightCasters.vert" />
+    <None Include="Content\Shaders\Lightning.frag" />
+    <None Include="Content\Shaders\Lightning.vert" />
+    <None Include="Content\Shaders\LightningMaps.frag" />
+    <None Include="Content\Shaders\LightningMaps.vert" />
+    <None Include="Content\Shaders\Lightning_Materials.frag" />
+    <None Include="Content\Shaders\Lightning_Materials.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

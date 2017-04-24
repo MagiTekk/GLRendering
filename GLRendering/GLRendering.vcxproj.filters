@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{daa7b781-9ce7-467b-be41-762ba4e90c98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -106,5 +109,61 @@
     <ResourceCompile Include="GLRendering.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Shaders\ColoredShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\ColoredShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\ColoredTextureShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\ColoredTextureShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\ColTextTransShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\ColTextTransShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\CoordinateSystems.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\CoordinateSystems.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lamp.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lamp.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\LightCasters.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\LightCasters.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lightning.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lightning.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lightning_Materials.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\Lightning_Materials.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\LightningMaps.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Content\Shaders\LightningMaps.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
