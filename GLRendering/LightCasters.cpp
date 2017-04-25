@@ -203,9 +203,9 @@ void LightCasters::Execute()
 		// Activate shader
 		lightingShader.Use();
 		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
-		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
+		//GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
-		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
+		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
 
 		// Bind diffuse map
 		glActiveTexture(GL_TEXTURE0);
@@ -228,6 +228,9 @@ void LightCasters::Execute()
 		glUniform3f(lightAmbientLoc, 0.2f, 0.2f, 0.2f);
 		glUniform3f(lightDiffuseLoc, 0.5f, 0.5f, 0.5f);
 		glUniform3f(lightSpecularLoc, 1.0f, 1.0f, 1.0f);
+
+		GLint lightDirPos = glGetUniformLocation(lightingShader.Program, "light.direction");
+		glUniform3f(lightDirPos, -0.2f, -1.0f, -0.3f);
 
 		// Camera/View transformation
 		glm::mat4 view;
@@ -259,7 +262,8 @@ void LightCasters::Execute()
 		}
 		glBindVertexArray(0); // Unbind VAO
 
-		// Lamp
+		// Lamp - not neccesary whn you have a directional light
+		/*
 		lampShader.Use();
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		viewLoc = glGetUniformLocation(lampShader.Program, "view");
@@ -278,6 +282,7 @@ void LightCasters::Execute()
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // Unbind VAO
+		*/
 
 #pragma endregion
 
