@@ -203,9 +203,9 @@ void LightCasters::Execute()
 		// Activate shader
 		lightingShader.Use();
 		GLint lightColorLoc = glGetUniformLocation(lightingShader.Program, "lightColor");
-		//GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
+		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
 		glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
-		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
+		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // vertex shader calculates view position
 
 		// Bind diffuse map
 		glActiveTexture(GL_TEXTURE0);
@@ -215,7 +215,7 @@ void LightCasters::Execute()
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		// Get/Set material uniform properties
-		GLfloat shine = 64.0f;
+		GLfloat shine = 32.0f;
 		GLint matSpecularLoc = glGetUniformLocation(lightingShader.Program, "material.specular");
 		GLint matShineLoc = glGetUniformLocation(lightingShader.Program, "material.shininess");
 		glUniform3f(matSpecularLoc, 0.5f, 0.5f, 0.5f);
@@ -229,8 +229,14 @@ void LightCasters::Execute()
 		glUniform3f(lightDiffuseLoc, 0.5f, 0.5f, 0.5f);
 		glUniform3f(lightSpecularLoc, 1.0f, 1.0f, 1.0f);
 
-		GLint lightDirPos = glGetUniformLocation(lightingShader.Program, "light.direction");
-		glUniform3f(lightDirPos, -0.2f, -1.0f, -0.3f);
+		// Attenuation of our spotlight, range 50 using http://www.ogre3d.org/tikiwiki/tiki-index.php?page=-Point+Light+Attenuation
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.constant"), 1.0f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.linear"), 0.09);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.quadratic"), 0.032);
+
+		// used for our direction light calculations
+		//GLint lightDirPos = glGetUniformLocation(lightingShader.Program, "light.direction");
+		//glUniform3f(lightDirPos, -0.2f, -1.0f, -0.3f);
 
 		// Camera/View transformation
 		glm::mat4 view;
@@ -263,7 +269,6 @@ void LightCasters::Execute()
 		glBindVertexArray(0); // Unbind VAO
 
 		// Lamp - not neccesary whn you have a directional light
-		/*
 		lampShader.Use();
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		viewLoc = glGetUniformLocation(lampShader.Program, "view");
@@ -282,7 +287,6 @@ void LightCasters::Execute()
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // Unbind VAO
-		*/
 
 #pragma endregion
 

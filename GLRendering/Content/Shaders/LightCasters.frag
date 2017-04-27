@@ -8,11 +8,16 @@ struct Material
 };
 
 struct Light {
-    //vec3 position;
+    vec3 position;
 	vec3 direction;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+	// used for attenuation of our spot light
+	float constant;
+    float linear;
+    float quadratic;
 };
 
 uniform Material material;
@@ -32,11 +37,7 @@ void main()
 	
 	// Diffuse
 	vec3 norm = normalize(Normal);
-
-	// Not using LightPos since we have are simulating a directional light
-	// Negate this since we are using a vector pointing from the light source to our fragment
-	vec3 lightDir = normalize(-light.direction); 
-
+	vec3 lightDir = normalize(LightPos - FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
 	
@@ -46,7 +47,14 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
 	//vec3 specular = light.specular * spec * (vec3(1.0f) - vec3(texture(material.specular, TexCoords))); // Here we inverse the sampled specular color. Black becomes white and white becomes black.
-	
+
+	// Attenuation, we use an attenuation formula like the one below
+	float distance = length(LightPos - FragPos);
+	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+	ambient  *= attenuation;
+	diffuse  *= attenuation;
+	specular *= attenuation;
+
 	vec3 result = ambient + diffuse + specular;
     color = vec4(result, 1.0f);
 }
